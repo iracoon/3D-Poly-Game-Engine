@@ -90,7 +90,7 @@ public class Terrain {
 	private RawModel generateTerrain(Loader loader, String heightMap) {
 
 		HeightsGenerator generator = new HeightsGenerator();
-		
+
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new File("res/" + heightMap + ".png"));
@@ -129,12 +129,23 @@ public class Terrain {
 				int topRight = topLeft + 1;
 				int bottomLeft = ((gz + 1) * VERTEX_COUNT) + gx;
 				int bottomRight = bottomLeft + 1;
-				indices[pointer++] = topLeft;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = topRight;
-				indices[pointer++] = topRight;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = bottomRight;
+
+				boolean mixed = (gz % 2 == 0);
+				if (gx % 2 == 0) {
+					indices[pointer++] = topLeft;
+					indices[pointer++] = bottomLeft;
+					indices[pointer++] = mixed ? topRight : bottomRight;
+					indices[pointer++] = bottomRight;
+					indices[pointer++] = topRight;
+					indices[pointer++] = mixed ? bottomLeft : topLeft;
+				} else {
+					indices[pointer++] = topRight;
+					indices[pointer++] = topLeft;
+					indices[pointer++] = mixed ? bottomRight : bottomLeft;
+					indices[pointer++] = bottomLeft;
+					indices[pointer++] = bottomRight;
+					indices[pointer++] = mixed ? topLeft : topRight;
+				}
 			}
 		}
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);

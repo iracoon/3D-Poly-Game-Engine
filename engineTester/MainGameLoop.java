@@ -70,6 +70,10 @@ public class MainGameLoop {
 		List<Terrain> terrains = new ArrayList<Terrain>();
 		terrains.add(terrain);
 
+		Terrain terrain2 = new Terrain(0, -2, loader, texturePack, blendMap, "heightmap");
+		terrains.add(terrain2);
+
+
 		TexturedModel lamp = new TexturedModel(OBJLoader.loadObjModel("lamp", loader),
 				new ModelTexture(loader.loadTexture("lamp")));
 		lamp.getTexture().setUseFakeLighting(true);

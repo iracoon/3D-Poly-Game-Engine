@@ -6,7 +6,7 @@ public class HeightsGenerator {
 
     private static final float AMPLITUDE = 20f;
     private static final int OCTAVES = 4;
-    private static final float ROUGHNESS = 0.1f;
+    private static final float ROUGHNESS = 0.3f;
 
     private Random random = new Random();
     private int seed;

@@ -97,7 +97,7 @@ public class Terrain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		int VERTEX_COUNT = 128;
+		int VERTEX_COUNT = 30;
 
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		heights = new float[VERTEX_COUNT][VERTEX_COUNT];

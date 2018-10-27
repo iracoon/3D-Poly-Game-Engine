@@ -40,10 +40,10 @@ public class MainGameLoop {
 
 		// *********TERRAIN TEXTURE STUFF**********
 		
-		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy2"));
-		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("mud"));
-		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("grassFlowers"));
-		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
+		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("graf"));
+		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("graf"));
+		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("graf"));
+		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("graf"));
 
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture,
 				gTexture, bTexture);

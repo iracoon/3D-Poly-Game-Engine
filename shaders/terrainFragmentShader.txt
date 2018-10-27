@@ -1,7 +1,7 @@
 #version 150
 
 flat in vec2 pass_textureCoordinates;
-in vec3 surfaceNormal;
+flat in vec3 surfaceNormal;
 in vec3 toLightVector[4];
 in vec3 toCameraVector;
 in float visibility;

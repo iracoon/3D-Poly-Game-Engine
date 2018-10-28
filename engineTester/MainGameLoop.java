@@ -41,7 +41,7 @@ public class MainGameLoop {
 		// *********TERRAIN TEXTURE STUFF**********
 		
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("graf"));
-		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("graf"));
+		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("sand"));
 		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("graf"));
 		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("graf"));
 
@@ -131,21 +131,21 @@ public class MainGameLoop {
 		Camera camera = new Camera(player);
 	
 		//**********Water Renderer Set-up************************
-		
+
 		WaterFrameBuffers buffers = new WaterFrameBuffers();
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		WaterTile water = new WaterTile(75, -75, 0);
 		waters.add(water);
-		
+
 		//****************Game Loop Below*********************
 
 		while (!Display.isCloseRequested()) {
 			player.move(terrain);
 			camera.move();
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-			
+
 			//render reflection texture
 			buffers.bindReflectionFrameBuffer();
 			float distance = 2 * (camera.getPosition().y - water.getHeight());
@@ -154,21 +154,21 @@ public class MainGameLoop {
 			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight()+1));
 			camera.getPosition().y += distance;
 			camera.invertPitch();
-			
+
 			//render refraction texture
 			buffers.bindRefractionFrameBuffer();
 			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()+1));
-			
+
 			//render to screen
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-			buffers.unbindCurrentFrameBuffer();	
+			buffers.unbindCurrentFrameBuffer();
 			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
-			waterRenderer.render(waters, camera, sun);
+			waterRenderer.render(waters, camera);
 			DisplayManager.updateDisplay();
 		}
 
 		//*********Clean Up Below**************
-		
+
 		buffers.cleanUp();
 		waterShader.cleanUp();
 		renderer.cleanUp();

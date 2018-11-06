@@ -32,6 +32,7 @@ public class StaticShader extends ShaderProgram{
 	private int location_offset;
 	private int location_plane;
 
+
 	public StaticShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
 	}
@@ -47,6 +48,7 @@ public class StaticShader extends ShaderProgram{
 	protected void getAllUniformLocations() {
 		location_transformationMatrix = super.getUniformLocation("transformationMatrix");
 		location_projectionMatrix = super.getUniformLocation("projectionMatrix");
+
 		location_viewMatrix = super.getUniformLocation("viewMatrix");
 		location_shineDamper = super.getUniformLocation("shineDamper");
 		location_reflectivity = super.getUniformLocation("reflectivity");
@@ -113,11 +115,13 @@ public class StaticShader extends ShaderProgram{
 		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 		super.loadMatrix(location_viewMatrix, viewMatrix);
 	}
+
+
 	
 	public void loadProjectionMatrix(Matrix4f projection){
 		super.loadMatrix(location_projectionMatrix, projection);
 	}
-	
-	
+
+
 
 }

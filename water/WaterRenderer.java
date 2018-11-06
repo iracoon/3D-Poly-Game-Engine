@@ -22,6 +22,8 @@ public class WaterRenderer {
 	private RawModel quad;
 	private WaterShader shader;
 	private WaterFrameBuffers fbos;
+	private float time = 0;
+	private static final float WAVE_SPEED = 0.4f;
 
 	public WaterRenderer(Loader loader, WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
 		this.shader = shader;
@@ -40,13 +42,21 @@ public class WaterRenderer {
 					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
 					WaterTile.TILE_SIZE);
 			shader.loadModelMatrix(modelMatrix);
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
+			//GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
+
+
+			////
+			GL11.glDrawElements(GL11.GL_TRIANGLES, quad.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			////
 		}
 		unbind();
 	}
 	
 	private void prepareRender(Camera camera){
 		shader.start();
+		/////
+		updateTime();
+		////
 		shader.loadViewMatrix(camera);
 		GL30.glBindVertexArray(quad.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
@@ -64,8 +74,47 @@ public class WaterRenderer {
 
 	private void setUpVAO(Loader loader) {
 		// Just x and z vectex positions here, y is set to 0 in v.shader
-		float[] vertices = { -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1 };
-		quad = loader.loadToVAO(vertices, 2);
+    	//quad = loader.loadToVAO(positions, indices);
+
+		final int VERTEX_COUNT = 100;
+		final float SIZE = 0.02f;
+
+		float[] positions = new float[VERTEX_COUNT * VERTEX_COUNT * 2];
+		int pointer = 0;
+		for(int i=0;i<VERTEX_COUNT;i++){
+			for(int j=0;j<VERTEX_COUNT;j++){
+				positions[pointer++] = j * SIZE;
+				positions[pointer++] = i * SIZE;
+			}
+		}
+
+		pointer = 0;
+		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
+		for(int gz=0;gz<VERTEX_COUNT-1;gz++){
+			for(int gx=0;gx<VERTEX_COUNT-1;gx++){
+				int topLeft = (gz*VERTEX_COUNT)+gx;
+				int topRight = topLeft + 1;
+				int bottomLeft = ((gz+1)*VERTEX_COUNT)+gx;
+				int bottomRight = bottomLeft + 1;
+				indices[pointer++] = topLeft;
+				indices[pointer++] = bottomLeft;
+				indices[pointer++] = topRight;
+				indices[pointer++] = topRight;
+				indices[pointer++] = bottomLeft;
+				indices[pointer++] = bottomRight;
+			}
+		}
+
+		quad = loader.loadData(positions, indices);
 	}
+
+
+	//ADD
+	private void updateTime(){
+		time+=DisplayManager.getFrameTimeSeconds()*WAVE_SPEED;
+		time %= 1;
+		shader.loadTime(time);
+	}
+
 
 }

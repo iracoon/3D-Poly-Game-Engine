@@ -39,7 +39,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 
 		// *********TERRAIN TEXTURE STUFF**********
-		
+
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("graf"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("sand"));
 		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("graf"));
@@ -80,9 +80,9 @@ public class MainGameLoop {
 
 		List<Entity> entities = new ArrayList<Entity>();
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
-		
+
 		//******************NORMAL MAP MODELS************************
-		
+
 
 		//************ENTITIES*******************
 
@@ -113,7 +113,7 @@ public class MainGameLoop {
 			}
 		}
 		entities.add(new Entity(rocks, new Vector3f(75, 4.6f, -75), 0, 0, 0, 75));
-		
+
 		//*******************OTHER SETUP***************
 
 		List<Light> lights = new ArrayList<Light>();
@@ -129,7 +129,7 @@ public class MainGameLoop {
 		Player player = new Player(stanfordBunny, new Vector3f(75, 5, -75), 0, 100, 0, 0.6f);
 		entities.add(player);
 		Camera camera = new Camera(player);
-	
+
 		//**********Water Renderer Set-up************************
 
 		WaterFrameBuffers buffers = new WaterFrameBuffers();

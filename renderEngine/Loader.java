@@ -37,18 +37,7 @@ public class Loader {
 		unbindVAO();
 		return vaoID;
 	}
-	
-	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals,
-			int[] indices) {
-		int vaoID = createVAO();
-		bindIndicesBuffer(indices);
-		storeDataInAttributeList(0, 3, positions);
-		storeDataInAttributeList(1, 2, textureCoords);
-		storeDataInAttributeList(2, 3, normals);
-		unbindVAO();
-		return new RawModel(vaoID, indices.length);
-	}
-	
+
 	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals, float[] tangents,
 			int[] indices) {
 		int vaoID = createVAO();
@@ -57,6 +46,26 @@ public class Loader {
 		storeDataInAttributeList(1, 2, textureCoords);
 		storeDataInAttributeList(2, 3, normals);
 		storeDataInAttributeList(3, 3, tangents);
+		unbindVAO();
+		return new RawModel(vaoID, indices.length);
+	}
+
+	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals,
+							  int[] indices) {
+		int vaoID = createVAO();
+		bindIndicesBuffer(indices);
+		storeDataInAttributeList(0, 3, positions);
+		storeDataInAttributeList(1, 2, textureCoords);
+		storeDataInAttributeList(2, 3, normals);
+		unbindVAO();
+		return new RawModel(vaoID, indices.length);
+	}
+
+	//added
+	public RawModel loadData(float[] vertices, int[] indices){
+		int vaoID = createVAO();
+		bindIndicesBuffer(indices);
+		storeDataInAttributeList(0, 2, vertices);
 		unbindVAO();
 		return new RawModel(vaoID, indices.length);
 	}
@@ -180,5 +189,6 @@ public class Loader {
 		buffer.flip();
 		return buffer;
 	}
+
 
 }

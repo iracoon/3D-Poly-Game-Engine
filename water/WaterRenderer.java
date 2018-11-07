@@ -1,5 +1,7 @@
 package water;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 
 import models.RawModel;
@@ -16,6 +18,7 @@ import renderEngine.Loader;
 import toolbox.Maths;
 import entities.Camera;
 import entities.Light;
+import org.lwjgl.util.vector.Vector2f;
 
 public class WaterRenderer {
 
@@ -42,11 +45,11 @@ public class WaterRenderer {
 					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
 					WaterTile.TILE_SIZE);
 			shader.loadModelMatrix(modelMatrix);
-			//GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
+			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 
 
 			////
-			GL11.glDrawElements(GL11.GL_TRIANGLES, quad.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			//GL11.glDrawElements(GL11.GL_TRIANGLES, quad.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			////
 		}
 		unbind();
@@ -54,12 +57,11 @@ public class WaterRenderer {
 	
 	private void prepareRender(Camera camera){
 		shader.start();
-		/////
 		updateTime();
-		////
 		shader.loadViewMatrix(camera);
 		GL30.glBindVertexArray(quad.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
+		GL20.glEnableVertexAttribArray(1);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -68,53 +70,79 @@ public class WaterRenderer {
 	
 	private void unbind(){
 		GL20.glDisableVertexAttribArray(0);
+		GL20.glDisableVertexAttribArray(1);
 		GL30.glBindVertexArray(0);
 		shader.stop();
 	}
 
-	private void setUpVAO(Loader loader) {
-		// Just x and z vectex positions here, y is set to 0 in v.shader
-    	//quad = loader.loadToVAO(positions, indices);
-
-		final int VERTEX_COUNT = 100;
-		final float SIZE = 0.02f;
-
-		float[] positions = new float[VERTEX_COUNT * VERTEX_COUNT * 2];
-		int pointer = 0;
-		for(int i=0;i<VERTEX_COUNT;i++){
-			for(int j=0;j<VERTEX_COUNT;j++){
-				positions[pointer++] = j * SIZE;
-				positions[pointer++] = i * SIZE;
-			}
-		}
-
-		pointer = 0;
-		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
-		for(int gz=0;gz<VERTEX_COUNT-1;gz++){
-			for(int gx=0;gx<VERTEX_COUNT-1;gx++){
-				int topLeft = (gz*VERTEX_COUNT)+gx;
-				int topRight = topLeft + 1;
-				int bottomLeft = ((gz+1)*VERTEX_COUNT)+gx;
-				int bottomRight = bottomLeft + 1;
-				indices[pointer++] = topLeft;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = topRight;
-				indices[pointer++] = topRight;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = bottomRight;
-			}
-		}
-
-		quad = loader.loadData(positions, indices);
-	}
-
-
-	//ADD
 	private void updateTime(){
 		time+=DisplayManager.getFrameTimeSeconds()*WAVE_SPEED;
 		time %= 1;
 		shader.loadTime(time);
 	}
 
+	int positionPointer = 0;
+	int indicatorPointer = 0;
+	int gridCount = 10;
+	int VERTICES_PER_SQUARE = 6;// 2 triangles, 3 vertices
+	int totalVertexCount = gridCount * gridCount * VERTICES_PER_SQUARE;
+
+	//vec2 , 2 coordinates per vertex
+	float[] pos = new float[totalVertexCount * 2];
+
+	//vec 4, 4 coordinates per vertex
+	float[] indicats = new float[totalVertexCount * 4];
+
+	private void setUpVAO(Loader loader) {
+
+		for (int row = 0; row < gridCount; row++)
+		{
+			for (int col = 0; col < gridCount; col++)
+			{
+				Vector2f[] cornerPos = calculateCornerPositions(col, row);
+				storeTriangle(cornerPos, pos, indicats, true);
+				storeTriangle(cornerPos, pos, indicats, false);
+			}
+		}
+		quad = loader.loadToVAO(pos, 2);
+	}
+
+	private void storeTriangle(Vector2f[] cornerPos, float[] positions, float[] indicators, boolean left) {
+		int index0 = left ? 0 : 2;
+		int index1 = 1;
+		int index2 = left ? 2 : 3;
+
+		packVertexData(cornerPos[index0], pos, indicats, getIndicators(index0, cornerPos, index1, index2));
+		packVertexData(cornerPos[index1], pos, indicats, getIndicators(index1, cornerPos, index2, index0));
+		packVertexData(cornerPos[index2], pos, indicats, getIndicators(index2, cornerPos, index0, index1));
+	}
+
+	public void packVertexData(Vector2f position, float[] pos, float[] indicats, float[] indicators) {
+		pos[positionPointer++] = position.x;
+		pos[positionPointer++] = position.y;
+		for(int z = 0; z < 4; z++)
+		{
+			indicats[indicatorPointer++] = indicators[z];
+		}
+	}
+
+
+	private Vector2f[] calculateCornerPositions(int col, int row) {
+		Vector2f[] vertices = new Vector2f[4];
+		vertices[0] = new Vector2f(col, row);
+		vertices[1] = new Vector2f(col, row + 1);
+		vertices[2] = new Vector2f(col + 1, row);
+		vertices[3] = new Vector2f(col + 1, row + 1);
+		return vertices;
+	}
+
+	private float[] getIndicators(int currentVertex, Vector2f[] vertexPositions, int vertex1, int vertex2) {
+		Vector2f currentVertexPos = vertexPositions[currentVertex];
+		Vector2f vertex1Pos = vertexPositions[vertex1];
+		Vector2f vertex2Pos = vertexPositions[vertex2];
+		Vector2f offset1 = Vector2f.sub(vertex1Pos, currentVertexPos, null);
+		Vector2f offset2 = Vector2f.sub(vertex2Pos, currentVertexPos, null);
+		return new float[] { offset1.x, offset1.y, offset2.x, offset2.y };
+	}
 
 }

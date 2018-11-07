@@ -23,8 +23,12 @@ public class WaterShader extends ShaderProgram {
 
 	@Override
 	protected void bindAttributes() {
+
 		bindAttribute(0, "position");
+		bindAttribute(1, "indicators");
+
 	}
+
 
 	@Override
 	protected void getAllUniformLocations() {

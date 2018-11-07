@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
@@ -61,6 +62,8 @@ public class Loader {
 		return new RawModel(vaoID, indices.length);
 	}
 
+
+
 	//added
 	public RawModel loadData(float[] vertices, int[] indices){
 		int vaoID = createVAO();
@@ -70,9 +73,26 @@ public class Loader {
 		return new RawModel(vaoID, indices.length);
 	}
 
+	//ADDED
+	public RawModel createWaterVao(float[] position, float[] indicators) {
+		int vaoID = createVAO();
+		storeDataInAttributeList(0, 2, position);
+		storeDataInAttributeList(1, 4, indicators);
+		unbindVAO();
+		return new RawModel(vaoID, position.length/2);
+	}
+
 	public RawModel loadToVAO(float[] positions, int dimensions) {
 		int vaoID = createVAO();
 		this.storeDataInAttributeList(0, dimensions, positions);
+		unbindVAO();
+		return new RawModel(vaoID, positions.length / dimensions);
+	}
+
+	public RawModel loadToVAO(float[] positions,float[] indicators,  int dimensions) {
+		int vaoID = createVAO();
+		this.storeDataInAttributeList(0, dimensions, positions);
+		this.storeDataInAttributeList(0, 4, indicators);
 		unbindVAO();
 		return new RawModel(vaoID, positions.length / dimensions);
 	}

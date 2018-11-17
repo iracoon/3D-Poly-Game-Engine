@@ -1,5 +1,6 @@
 package water;
 
+import entities.Light;
 import org.lwjgl.util.vector.Matrix4f;
 import shaders.ShaderProgram;
 import toolbox.Maths;
@@ -16,6 +17,10 @@ public class WaterShader extends ShaderProgram {
 	private int location_reflectionTexture;
 	private int location_refractionTexture;
 	private int location_time;
+	private int location_lightPosition;
+	private int location_lightColour;
+	private int location_depthMap;
+	private int location_cameraPosition;
 
 	public WaterShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -33,34 +38,45 @@ public class WaterShader extends ShaderProgram {
 	@Override
 	protected void getAllUniformLocations() {
 		location_projectionMatrix = getUniformLocation("projectionMatrix");
-		location_time = super.getUniformLocation("time");
+		location_time = getUniformLocation("time");
 		location_viewMatrix = getUniformLocation("viewMatrix");
 		location_modelMatrix = getUniformLocation("modelMatrix");
 		location_reflectionTexture = getUniformLocation("reflectionTexture");
 		location_refractionTexture = getUniformLocation("refractionTexture");
+		location_lightPosition = getUniformLocation("lightPosition");
+		location_lightColour = getUniformLocation("lightColour");
+		location_depthMap = getUniformLocation("depthMap");
+		location_cameraPosition = getUniformLocation("cameraPosition");
 	}
 
 	public void connectTextureUnits(){
 		super.loadInt(location_reflectionTexture, 0);
 		super.loadInt(location_refractionTexture, 1);
+		super.loadInt(location_depthMap, 2);
+	}
+
+	public void loadLight(Light light){
+		super.loadVector(location_lightColour, light.getColour());
+		super.loadVector(location_lightPosition, light.getPosition());
 	}
 
 
 	public void loadProjectionMatrix(Matrix4f projection) {
 		loadMatrix(location_projectionMatrix, projection);
 	}
-	
+
 	public void loadViewMatrix(Camera camera){
 		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 		loadMatrix(location_viewMatrix, viewMatrix);
-	}
-
-	public void loadTime(float time){
-		super.loadFloat(location_time, time);
+		super.loadVector(location_cameraPosition, camera.getPosition());
 	}
 
 	public void loadModelMatrix(Matrix4f modelMatrix){
 		loadMatrix(location_modelMatrix, modelMatrix);
+	}
+
+	public void loadTime(float time){
+		super.loadFloat(location_time, time);
 	}
 
 }

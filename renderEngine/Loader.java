@@ -77,7 +77,7 @@ public class Loader {
 	public RawModel createWaterVao(float[] position, float[] indicators) {
 		int vaoID = createVAO();
 		storeDataInAttributeList(0, 2, position);
-		storeDataInAttributeList(1, 4, indicators);
+		storeDataInAttributeList(5, 4, indicators);
 		unbindVAO();
 		return new RawModel(vaoID, position.length/2);
 	}
@@ -92,7 +92,7 @@ public class Loader {
 	public RawModel loadToVAO(float[] positions,float[] indicators,  int dimensions) {
 		int vaoID = createVAO();
 		this.storeDataInAttributeList(0, dimensions, positions);
-		this.storeDataInAttributeList(0, 4, indicators);
+		this.storeDataInAttributeList(1, 4, indicators);
 		unbindVAO();
 		return new RawModel(vaoID, positions.length / dimensions);
 	}

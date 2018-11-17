@@ -26,7 +26,7 @@ public class WaterRenderer {
 	private WaterShader shader;
 	private WaterFrameBuffers fbos;
 	private float time = 0;
-	private static final float WAVE_SPEED = 0.4f;
+	private static final float WAVE_SPEED = 0.02f;
 
 	public WaterRenderer(Loader loader, WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
 		this.shader = shader;
@@ -38,8 +38,8 @@ public class WaterRenderer {
 		setUpVAO(loader);
 	}
 
-	public void render(List<WaterTile> water, Camera camera) {
-		prepareRender(camera);	
+	public void render(List<WaterTile> water, Camera camera, Light sun) {
+		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
 					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
@@ -47,18 +47,18 @@ public class WaterRenderer {
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 
-
-			////
+				////
 			//GL11.glDrawElements(GL11.GL_TRIANGLES, quad.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			////
 		}
 		unbind();
 	}
 	
-	private void prepareRender(Camera camera){
+	private void prepareRender(Camera camera, Light sun){
 		shader.start();
-		updateTime();
 		shader.loadViewMatrix(camera);
+		updateTime();
+		shader.loadLight(sun);
 		GL30.glBindVertexArray(quad.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
@@ -66,6 +66,10 @@ public class WaterRenderer {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionDepthTexture());
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	private void unbind(){
@@ -76,14 +80,13 @@ public class WaterRenderer {
 	}
 
 	private void updateTime(){
-		time+=DisplayManager.getFrameTimeSeconds()*WAVE_SPEED;
-		time %= 1;
+		time += DisplayManager.getFrameTimeSeconds()*WAVE_SPEED;
 		shader.loadTime(time);
 	}
 
 	int positionPointer = 0;
 	int indicatorPointer = 0;
-	int gridCount = 10;
+	int gridCount = 20;
 	int VERTICES_PER_SQUARE = 6;// 2 triangles, 3 vertices
 	int totalVertexCount = gridCount * gridCount * VERTICES_PER_SQUARE;
 
@@ -104,7 +107,7 @@ public class WaterRenderer {
 				storeTriangle(cornerPos, pos, indicats, false);
 			}
 		}
-		quad = loader.loadToVAO(pos, 2);
+		quad = loader.loadToVAO(pos, indicats, 2);
 	}
 
 	private void storeTriangle(Vector2f[] cornerPos, float[] positions, float[] indicators, boolean left) {
@@ -112,22 +115,22 @@ public class WaterRenderer {
 		int index1 = 1;
 		int index2 = left ? 2 : 3;
 
-		packVertexData(cornerPos[index0], pos, indicats, getIndicators(index0, cornerPos, index1, index2));
-		packVertexData(cornerPos[index1], pos, indicats, getIndicators(index1, cornerPos, index2, index0));
-		packVertexData(cornerPos[index2], pos, indicats, getIndicators(index2, cornerPos, index0, index1));
+		packVertexData(cornerPos[index0], positions, indicators, getIndicators(index0, cornerPos, index1, index2));
+		packVertexData(cornerPos[index1], positions, indicators, getIndicators(index1, cornerPos, index2, index0));
+		packVertexData(cornerPos[index2], positions, indicators, getIndicators(index2, cornerPos, index0, index1));
 	}
 
 	public void packVertexData(Vector2f position, float[] pos, float[] indicats, float[] indicators) {
-		pos[positionPointer++] = position.x;
-		pos[positionPointer++] = position.y;
+		pos[positionPointer++] = position.x * 0.068f;
+		pos[positionPointer++] = position.y * 0.068f;
 		for(int z = 0; z < 4; z++)
 		{
-			indicats[indicatorPointer++] = indicators[z];
+			indicats[indicatorPointer++] = indicators[z] * 0.068f;
 		}
 	}
 
 
-	private Vector2f[] calculateCornerPositions(int col, int row) {
+	private Vector2f[] calculateCornerPositions(float col, float row) {
 		Vector2f[] vertices = new Vector2f[4];
 		vertices[0] = new Vector2f(col, row);
 		vertices[1] = new Vector2f(col, row + 1);

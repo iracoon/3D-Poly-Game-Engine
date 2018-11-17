@@ -136,7 +136,7 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(75, -75, 0);
+		WaterTile water = new WaterTile(20, -200, -1);
 		waters.add(water);
 
 		//****************Game Loop Below*********************
@@ -163,7 +163,7 @@ public class MainGameLoop {
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			buffers.unbindCurrentFrameBuffer();
 			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
-			waterRenderer.render(waters, camera);
+			waterRenderer.render(waters, camera, sun);
 			DisplayManager.updateDisplay();
 		}
 

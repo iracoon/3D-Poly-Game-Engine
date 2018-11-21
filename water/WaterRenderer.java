@@ -86,7 +86,7 @@ public class WaterRenderer {
 
 	int positionPointer = 0;
 	int indicatorPointer = 0;
-	int gridCount = 20;
+	int gridCount = 50;
 	int VERTICES_PER_SQUARE = 6;// 2 triangles, 3 vertices
 	int totalVertexCount = gridCount * gridCount * VERTICES_PER_SQUARE;
 

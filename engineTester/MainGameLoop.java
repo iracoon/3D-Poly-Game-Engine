@@ -42,8 +42,8 @@ public class MainGameLoop {
 
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("graf"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("sand"));
-		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("graf"));
-		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("graf"));
+		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("lessdeath"));
+		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
 
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture,
 				gTexture, bTexture);
@@ -66,11 +66,11 @@ public class MainGameLoop {
 
 		fern.getTexture().setHasTransparency(true);
 
-		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
+		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "barg");
 		List<Terrain> terrains = new ArrayList<Terrain>();
 		terrains.add(terrain);
 
-		Terrain terrain2 = new Terrain(0, -2, loader, texturePack, blendMap, "heightmap");
+		Terrain terrain2 = new Terrain(0, -2, loader, texturePack, blendMap, "barg");
 		terrains.add(terrain2);
 
 
@@ -136,7 +136,7 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(20, -200, -1);
+		WaterTile water = new WaterTile(5, -200, 0);
 		waters.add(water);
 
 		//****************Game Loop Below*********************

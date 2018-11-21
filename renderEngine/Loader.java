@@ -62,6 +62,15 @@ public class Loader {
 		return new RawModel(vaoID, indices.length);
 	}
 
+	//ADDEDADDED
+	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals) {
+		int vaoID = createVAO();
+		storeDataInAttributeList(0, 3, positions);
+		storeDataInAttributeList(1, 2, textureCoords);
+		storeDataInAttributeList(2, 3, normals);
+		unbindVAO();
+		return new RawModel(vaoID, positions.length);
+	}
 
 
 	//added

@@ -130,10 +130,22 @@ public class Terrain {
 	//////////////
 	private void storeGridSquare(int col, int row, float[][] heights,float[] vertices, float[] normals, float[] textureCoords) {
 		Vector3f[] cornerPos = calculateCornerPositions(col, row, heights);
-		Vector3f normalTopLeft = calcNormal(cornerPos[0], cornerPos[1], cornerPos[2]);
-		Vector3f normalBottomRight = calcNormal(cornerPos[2], cornerPos[1], cornerPos[3]);
-		storeTriangle(cornerPos, normalTopLeft, 0, 1, 2, vertices, normals, textureCoords, row, col);
-		storeTriangle(cornerPos, normalBottomRight, 2, 1, 3, vertices, normals, textureCoords, row, col);
+		boolean rightHanded = col % 2 != row % 2;
+
+		if(rightHanded)
+		{
+			Vector3f normalTopLeft = calcNormal(cornerPos[0], cornerPos[1], cornerPos[2]);
+			Vector3f normalBottomRight = calcNormal(cornerPos[2], cornerPos[1], cornerPos[3]);
+			storeTriangle(cornerPos, normalTopLeft, 0, 1, 2, vertices, normals, textureCoords, row, col);
+			storeTriangle(cornerPos, normalBottomRight, 2, 1, 3, vertices, normals, textureCoords, row, col);
+		}
+		else
+		{
+			Vector3f normalTopLeft = calcNormal(cornerPos[0], cornerPos[1], cornerPos[3]);
+			Vector3f normalBottomRight = calcNormal(cornerPos[2], cornerPos[0], cornerPos[3]);
+			storeTriangle(cornerPos, normalTopLeft, 0, 1, 3, vertices, normals, textureCoords, row, col);
+			storeTriangle(cornerPos, normalBottomRight, 2, 0, 3, vertices, normals, textureCoords, row, col);
+		}
 	}
 
 	private void storeTriangle(Vector3f[] cornerPos, Vector3f normal, int index0, int index1,
